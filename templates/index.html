@@ -1,0 +1,106 @@
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundation for Sites</title>
+    <link rel="stylesheet" href={{ url_for('static', filename='foundation.css') }}>
+    <link rel="stylesheet" href={{ url_for('static', filename='app.css') }}>
+    <link rel="stylesheet" href={{ url_for('static', filename='foundation-icons.css') }}>
+    
+  </head>
+  <body>
+
+
+
+<div class="top-bar">
+    <div class="top-bar-left">
+      <ul class="dropdown menu" data-dropdown-menu>
+        <li class="menu-text">Cisco POS</li>
+        <li>
+            <li><a href="/">Home</a></li>
+        </li>
+        <li>
+          <a href="#">CSA Reports</a>
+          <ul class="menu vertical">
+            <li><a href="/">SWSO</a></li>
+          </ul>
+        </li>
+        <li>
+            <a href="#">Tools</a>
+            <ul class="menu vertical">
+                <li><a href="amlist">AM Customer List Tool</a></li>
+                <li><a href="aggsearch">Aggressive Search Tool</a></li>
+                <li><a href="realtime">Real Time Search Tool</a></li>
+            </ul>
+        </li>        
+        
+      </ul>
+    </div>
+    <div class="top-bar-right">
+      <ul class="menu">
+      </ul>
+    </div>
+  </div>   
+
+
+
+    <div class="grid-container">
+      <div class="grid-x grid-padding-x">
+        <div class="large-8 medium-8 cell">
+          <h1>{{ title }}</h1>
+        </div>
+      </div>
+
+      <div class="grid-x grid-padding-x">
+        <div class="large-8 medium-8 cell">
+          <div class="callout">
+            <p>{{ description }} </p>
+            <h3><strong>{{ recent }}</strong></h3>
+            <p>Date of most recent report</p>
+            
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-x grid-padding-x">
+        <div class="large-8 medium-8 cell">
+          <h5>Files for SWSO</h5>
+          <!-- Grid Example -->
+
+            <div class="large-8 medium-8 cell">
+              <div class="primary callout">
+                <p>Current_data is the main report for all AMs in SWSO</p>
+                <p>Monthly reports includes same data as Current_data, seperated by month</p>
+                <p>For each report, click the POS ID to generate email for OneCommercial</p>
+
+                {%- for item in files %}
+                <ul><a href="/SWSO/{{ item }}" target="_blank">{{ item }}</a></ul>
+                {%- endfor %}
+
+                <p>Aggressive Search Files</p>
+                <p>Aggressive Search Reports are an optional report that will include potentially misspelled account names</p>
+                {%- for item in aggfiles %}
+                <ul><a href="/SWSO/{{ item }}" target="_blank">{{ item }}</a></ul>
+                {%- endfor %}
+                
+              </div>
+            </div>
+
+
+      </div>
+
+
+
+
+
+    </div>
+
+    <script src={{ url_for('static', filename='vendor/jquery.js') }}></script>
+    <script src={{ url_for('static', filename='vendor/what-input.js') }}></script>
+    <script src={{ url_for('static', filename='vendor/foundation.js') }}></script>
+    <script src={{ url_for('static', filename='app.js') }}></script>
+  </body>
+</html>

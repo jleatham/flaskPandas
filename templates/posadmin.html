@@ -1,0 +1,207 @@
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Tool</title>
+    <link rel="stylesheet" href={{ url_for('static', filename='foundation.css') }}>
+    <link rel="stylesheet" href={{ url_for('static', filename='app.css') }}>
+    <link rel="stylesheet" href={{ url_for('static', filename='foundation-icons.css') }}>
+    <link rel="stylesheet" href={{ url_for('static', filename='jquery.dynatable.css') }}>
+    
+  </head>
+  <body>
+      <style>
+         p { margin: 0 !important; }
+        </style>
+
+
+
+<div class="top-bar">
+        <div class="top-bar-left">
+          <ul class="dropdown menu" data-dropdown-menu>
+            <li class="menu-text">Cisco POS</li>
+            <li>
+                <li><a href="/">Home</a></li>
+            </li>
+            <li>
+              <a href="#">CSA Reports</a>
+              <ul class="menu vertical">
+                <li><a href="/">SWSO</a></li>
+              </ul>
+            </li>
+            <li>
+                <a href="#">Tools</a>
+                <ul class="menu vertical">
+                    <li><a href="amlist">AM Customer List Tool</a></li>
+                    <li><a href="aggsearch">Aggressive Search Tool</a></li>
+                    <li><a href="realtime">Real Time Search Tool</a></li>
+                </ul>
+            </li>        
+            
+          </ul>
+        </div>
+        <div class="top-bar-right">
+          <ul class="menu">
+            <li><a href="posadmin">Admin</a></li>
+          </ul>
+        </div>
+      </div>   
+
+
+
+    <div class="grid-container">
+      <div class="grid-x grid-padding-x">
+        <div class="large-12 cell">
+          <h1>{{ title }}</h1>
+        </div>
+      </div>
+
+      <table>
+          <tr>
+            
+                <td valign="top">
+                    <p>re-run all reports</p>                    
+                    <form action="/posadmin" id="adminRunAll">
+                        <label>Secret:</label>
+                        <input name="secret" type="password" placeholder="authentication code" autocorrect="off" autocapitalize="none" />
+                        <input class="success button" type="submit" value="Run">
+                    </form>
+                </td>
+            
+            
+                <td valign="top">
+                    <p>View Logs</p>
+                    <form action="/posadmin" id="adminViewLogs">
+                        <label>Secret</label>
+                        <input name="secret" type="password" placeholder="authentication code" autocorrect="off" autocapitalize="none" />                   
+                        <input class="success button" type="submit" value="View">
+                    </form>
+                </td>
+         
+          </tr>
+      </table>
+        
+
+                
+
+
+                
+
+
+    
+            
+
+                
+            
+     
+ 
+
+
+      <div class="grid-x grid-padding-x">
+        <div class="large-12 cell">
+          <h5>Results:</h5>
+          <!-- Grid Example -->
+
+            <div class="large-12 cell">
+              <div id="display" class="primary callout">
+
+                
+              </div>
+            </div>
+
+
+      </div>
+
+
+
+
+
+    </div>
+
+    <script src={{ url_for('static', filename='vendor/jquery.js') }}></script>
+    <script src={{ url_for('static', filename='vendor/what-input.js') }}></script>
+    <script src={{ url_for('static', filename='vendor/foundation.js') }}></script>
+    <script src={{ url_for('static', filename='app.js') }}></script>
+    <script src={{ url_for('static', filename='jquery.dynatable.js') }}></script>
+    <script>
+        function getType (val) {
+            if (typeof val === 'undefined') return 'undefined';
+            if (typeof val === 'object' && !val) return 'null';
+            return ({}).toString.call(val).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+        }
+    </script>
+
+          <script>
+                $(document).on('submit','form',function(event){ //looks for any form on page that is submitted
+                    event.preventDefault(); // Stop form from submitting normally
+                 
+                    // Get some values from elements on the page:
+                    var $form = $( this ); //loads all data from form into parent variable
+                    var form_id = $form.attr('id'); //find the ID of the submitted form
+                    console.log(form_id); //for testing
+                    var secret = $form.find( "input[name='secret']" ).val(); //get the value of the email field
+                    var url = $form.attr( "action" ); //for  flask to know what URL is associated with POST                
+                    var email = 'none';
+                    if (form_id == 'adminRunAll'){
+                        console.log("This is the adminRunAll function");
+                        document.getElementById('display').innerHTML = "This will take a while, see logs for progress";
+                        $form.find( "input[name='secret']" ).val(""); //remove the filed input on submit                        
+                        $.ajax({
+                            url: url,
+                            data: {'function':form_id ,'secret': secret},
+                            type: 'POST',
+                            timeout: 1000000,
+                            success: function(response){
+                                filter_return_json_to_list(response,email)
+                            },
+                            error: function(jqXHR, textStatus, errorThrown){
+                                console.log(textStatus);
+                                document.getElementById('display').innerHTML = textStatus;
+                            }
+                    });                         
+                    } else if (form_id == 'adminViewLogs') {
+                        console.log("This is the adminViewLogs function");
+                        $.ajax({
+                            url: url,
+                            data: {'function':form_id ,'secret': secret},
+                            type: 'POST',
+                            timeout: 10000,
+                            success: function(response){
+                                filter_return_json_to_list(response,email)
+                            },
+                            error: function(jqXHR, textStatus, errorThrown){
+                                console.log(textStatus);
+                                document.getElementById('display').innerHTML = textStatus;
+                            }
+                    });                        
+                    } 
+
+                return false; //not sure why this is needed, maybe saying if no ajax post then do nothing
+            });
+
+                </script>
+                <script>
+                    function filter_return_json_to_list(response,email){
+                        var x = "";
+                        for (var key in response){
+                            if (key === "status"){
+                                x = response[key];
+                            }
+                            else if (response[key]["email"]===email){
+                                for (var account in response[key]["accounts"]){
+                                    x += "<p>" + response[key]["accounts"][account] + "</p>";
+                                }
+                            }
+                        }
+                        if (x != ''){
+                            document.getElementById('display').innerHTML = x;
+                        } else {
+                            document.getElementById('display').innerHTML = "Could not find this CCO ID";
+                        }
+                            
+                    }
+                </script>
+  </body>
+</html>
