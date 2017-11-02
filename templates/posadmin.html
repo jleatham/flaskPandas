@@ -73,9 +73,7 @@
             
                 <td valign="top">
                     <p>View Logs</p>
-                    <form action="/posadmin" id="adminViewLogs">
-                        <label>Secret</label>
-                        <input name="secret" type="password" placeholder="authentication code" autocorrect="off" autocapitalize="none" />                   
+                    <form action="/posadmin" id="adminViewLogs">                 
                         <input class="success button" type="submit" value="View">
                     </form>
                 </td>
@@ -165,7 +163,7 @@
                         console.log("This is the adminViewLogs function");
                         $.ajax({
                             url: url,
-                            data: {'function':form_id ,'secret': secret},
+                            data: {'function':form_id},
                             type: 'POST',
                             timeout: 10000,
                             success: function(response){
