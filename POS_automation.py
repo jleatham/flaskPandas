@@ -244,6 +244,24 @@ def to_csv_from_json_v1(FILES,ALLCSV, NONERRORCSV):
             except Exception as e:
                 print ("file not readable in pandas: "+ file)
                 print (e)
+                print("Trying to fix")
+                #how to add a try block on this to avoid crashes? nested try/except
+                df = pd.read_csv(file)
+                i = 0
+                if "POS Transaction ID/Unique ID" not in df.columns:
+                    while i < 4:
+                        df2 = pd.read_csv(file,skiprows=[i])
+                        if "POS Transaction ID/Unique ID" not in df2.columns:
+                            print("Couldn't find POS data in row "+str(i))
+                            i += 1
+                        else:
+                            i = 5
+                            print("Found POS data in row "+str(i))
+                            with open(file, 'w') as f:
+                                df2.to_csv(f)
+                                print("re-wrote file: "+filename)
+                else:
+                    print("headers are correct, not sure the issue")
                 #print (sys.exc_info()[0])
                 pass
         else: #file is a duplicate
