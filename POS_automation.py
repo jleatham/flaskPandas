@@ -255,10 +255,10 @@ def to_csv_from_json_v1(FILES,ALLCSV, NONERRORCSV):
                             print("Couldn't find POS data in row "+str(i))
                             i += 1
                         else:
-                            i = 5
                             print("Found POS data in row "+str(i))
+                            i = 5
                             with open(file, 'w') as f:
-                                df2.to_csv(f)
+                                df2.to_csv(f, index=False)
                                 print("re-wrote file: "+filename)
                 else:
                     print("headers are correct, not sure the issue")
