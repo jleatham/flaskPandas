@@ -237,7 +237,7 @@ def to_csv_from_json_v1(FILES,ALLCSV, NONERRORCSV):
                     non_error_results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID', 'POS SCA Mode':'Mode','Salesrep Name':'AM Credited'}, inplace=True)                    
                     non_error_results["Sort Here"] = EMAIL
                     non_error_results["Region Sort"] = REGION
-                    non_error_results = non_error_results[['Date','Sort Here','Salesrep Name','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode','Region Sort']]
+                    non_error_results = non_error_results[['Date','Sort Here','AM Credited','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode','Region Sort']]
                     non_error_results['Date'] = pd.to_datetime(non_error_results['Date'], errors='coerce')
                     if os.path.isfile(NONERRORCSV):
                         with open(NONERRORCSV, 'a') as f:
