@@ -31,7 +31,8 @@ def index():
     try: #my curl test throws error when the main report is running
         agg_html_files = sorted(agg_html_files)
         html_files = sorted(html_files) #sort list alphabetically
-        html_files.insert(0,html_files.pop(html_files.index("current_data.html"))) #move to beginning of list
+        #html_files.insert(0,html_files.pop(html_files.index("current_data.html"))) #move to beginning of list
+        html_files.pop(html_files.index("current_data.html")) #remove from list as I put it as a button on page
         html_files.append(html_files.pop(html_files.index("non_error_pos_data.html"))) #move to end of list
     except:
         print("cannot process files as report is being ran")
