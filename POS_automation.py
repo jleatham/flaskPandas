@@ -42,6 +42,9 @@ import json
 from bs4 import BeautifulSoup as Soup
 from collections import deque
 from ciscosparkapi import CiscoSparkAPI
+import codecs
+from io import StringIO
+
 
 
 
@@ -271,6 +274,19 @@ def to_csv_from_json_v1(FILES,ALLCSV, NONERRORCSV):
                 except Exception as e:
                     print(e)
                     print("Can't even load file into pandas: "+ file)
+                    print("trying to force encoding")
+                    try:
+                        with codecs.open(file,'r', 'windows-1252', errors="replace") as f:
+                            text = f.read()
+                        TESTDATA = StringIO(text)
+                        df = pd.read_csv(TESTDATA)
+                        results = df[df["POS Transaction ID/Unique ID"].str.isnumeric()]
+                        with open(file, 'w') as f:
+                            results.to_csv(f)
+                            print("re-wrote file: "+filename)                        
+                    except Exception as e:
+                        print(e)
+                        print("Can't force encoding")
 
                 #print (sys.exc_info()[0])
                 pass
