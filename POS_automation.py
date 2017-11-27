@@ -109,8 +109,10 @@ def prepare_test():
         shutil.move(file, home_file_path+filename)
         print("moved: "+file)
     for file in glob.glob(home_file_path+ "filteredPOS" + '/*.*'):
-        os.remove(file)
-        print("removed:" + file)
+        filename = os.path.basename(file)
+        if not "aggressive" in filename:
+            os.remove(file)
+            print("removed:" + file)
 
 
 def check_mbr_v1(POS):
@@ -213,13 +215,15 @@ def to_csv_from_json_v1(FILES,ALLCSV, NONERRORCSV):
                 #df = df.dropna(subset=["POS Transaction ID/Unique ID"]).set_index("POS Transaction ID/Unique ID")
                 for v in data.values():
                     EMAIL = v["email"]
+                    REGION = v["SL5"]
                     ACCOUNTS = v["accounts"]
                     FALSE = v["false_positives"]
                     results = df[(df['End Customer Source Customer Name'].isin(ACCOUNTS) | df['Ship-To Source Customer Name'].isin(ACCOUNTS) | df['Sold-To Source Customer Name'].isin(ACCOUNTS)) & ~df["Salesrep Email"].str.contains(EMAIL) & ~df['End Customer Source Customer Name'].isin(FALSE)] 
                     results.index.names = ['POS ID']
-                    results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID','POS SCA Mode':'Mode'}, inplace=True)
+                    results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID','POS SCA Mode':'Mode','Salesrep Name':'AM Credited'}, inplace=True)
                     results["Sort Here"] = EMAIL
-                    results = results[['Date','Sort Here','Salesrep Name','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode']]
+                    results["Region Sort"] = REGION
+                    results = results[['Date','Sort Here','AM Credited','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode','Region Sort']]
                     results['Date'] = pd.to_datetime(results['Date'], errors='coerce')
                     if os.path.isfile(ALLCSV):
                         with open(ALLCSV, 'a') as f:
@@ -230,9 +234,10 @@ def to_csv_from_json_v1(FILES,ALLCSV, NONERRORCSV):
 
                     non_error_results = df[df["Salesrep Email"].str.contains(EMAIL) ]#& len(df.index)<20
                     non_error_results.index.names = ['POS ID']
-                    non_error_results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID', 'POS SCA Mode':'Mode'}, inplace=True)                    
+                    non_error_results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID', 'POS SCA Mode':'Mode','Salesrep Name':'AM Credited'}, inplace=True)                    
                     non_error_results["Sort Here"] = EMAIL
-                    non_error_results = non_error_results[['Date','Sort Here','Salesrep Name','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode']]
+                    non_error_results["Region Sort"] = REGION
+                    non_error_results = non_error_results[['Date','Sort Here','Salesrep Name','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode','Region Sort']]
                     non_error_results['Date'] = pd.to_datetime(non_error_results['Date'], errors='coerce')
                     if os.path.isfile(NONERRORCSV):
                         with open(NONERRORCSV, 'a') as f:
