@@ -251,7 +251,11 @@ def to_csv_from_json_v1(FILES,ALLCSV, NONERRORCSV):
                 print (e)
                 print("Trying to fix")
                 #how to add a try block on this to avoid crashes? nested try/except
-                df = pd.read_csv(file)
+                try:
+                    df = pd.read_csv(file)
+                except Exception as e:
+                    print(e)
+                    print("Can't even load file into pandas: "+ file)
                 i = 0
                 if "POS Transaction ID/Unique ID" not in df.columns:
                     while i < 4:
@@ -359,12 +363,14 @@ def update_single_am_results(EMAIL,ALLCSV):
             for v in data.values():
                 if v["email"] == EMAIL:
                     ACCOUNTS = v["accounts"]
+                    REGION = v["SL5"]
                     FALSE = v["false_positives"]
                     results = df[(df['End Customer Source Customer Name'].isin(ACCOUNTS) | df['Ship-To Source Customer Name'].isin(ACCOUNTS) | df['Sold-To Source Customer Name'].isin(ACCOUNTS)) & ~df["Salesrep Email"].str.contains(EMAIL) & ~df['End Customer Source Customer Name'].isin(FALSE)] 
                     results.index.names = ['POS ID']
-                    results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID','POS SCA Mode':'Mode'}, inplace=True)
+                    results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID','POS SCA Mode':'Mode','Salesrep Name':'AM Credited'}, inplace=True)
                     results["Sort Here"] = EMAIL
-                    results = results[['Date','Sort Here','Salesrep Name','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode']]
+                    results["Region Sort"] = REGION
+                    results = results[['Date','Sort Here','AM Credited','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode','Region Sort']]
                     results['Date'] = pd.to_datetime(results['Date'], errors='coerce')
                     if os.path.isfile(ALLCSV):
                         with open(ALLCSV, 'a') as f:
@@ -470,9 +476,9 @@ def create_aggressive_search_csv_for_am(EMAIL,DISTANCE):
         df = pd.read_csv(file, encoding='cp1252',low_memory=False, usecols=["POS Transaction ID/Unique ID","Posted Date",	'POS Split Adjusted Value USD', 'Product ID','POS SCA Mode','Ship-To Source Customer Name','Sold-To Source Customer Name',"End Customer Source Customer Name","End Customer CR Party ID","Salesrep Email","Salesrep Name"]).set_index("POS Transaction ID/Unique ID")
         results = df[df['End Customer Source Customer Name'].isin(final_pos_list)]
         results.index.names = ['POS ID']
-        results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID','POS SCA Mode':'Mode'}, inplace=True)
+        results.rename(columns = {'Posted Date':'Date','POS Split Adjusted Value USD':'$$$','Ship-To Source Customer Name':'Ship-To','Sold-To Source Customer Name':'Sold-To','End Customer Source Customer Name':'End Customer','End Customer CR Party ID':'Party ID','POS SCA Mode':'Mode','Salesrep Name':'AM Credited'}, inplace=True)
         results["Sort Here"] = EMAIL
-        results = results[['Date','Sort Here','Salesrep Name','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode']]
+        results = results[['Date','Sort Here','AM Credited','End Customer','Product ID','$$$','Ship-To','Sold-To','Party ID','Mode']]
         results['Date'] = pd.to_datetime(results['Date'], errors='coerce')
         if os.path.isfile(aggressive_search_file):
             with open(aggressive_search_file, 'a') as f:
