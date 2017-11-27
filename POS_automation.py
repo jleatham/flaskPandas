@@ -253,24 +253,25 @@ def to_csv_from_json_v1(FILES,ALLCSV, NONERRORCSV):
                 #how to add a try block on this to avoid crashes? nested try/except
                 try:
                     df = pd.read_csv(file)
+                    i = 0
+                    if "POS Transaction ID/Unique ID" not in df.columns:
+                        while i < 4:
+                            df2 = pd.read_csv(file,skiprows=[i])
+                            if "POS Transaction ID/Unique ID" not in df2.columns:
+                                print("Couldn't find POS data in row "+str(i))
+                                i += 1
+                            else:
+                                print("Found POS data in row "+str(i))
+                                i = 5
+                                with open(file, 'w') as f:
+                                    df2.to_csv(f, index=False)
+                                    print("re-wrote file: "+filename)
+                    else:
+                        print("headers are correct, not sure the issue")                    
                 except Exception as e:
                     print(e)
                     print("Can't even load file into pandas: "+ file)
-                i = 0
-                if "POS Transaction ID/Unique ID" not in df.columns:
-                    while i < 4:
-                        df2 = pd.read_csv(file,skiprows=[i])
-                        if "POS Transaction ID/Unique ID" not in df2.columns:
-                            print("Couldn't find POS data in row "+str(i))
-                            i += 1
-                        else:
-                            print("Found POS data in row "+str(i))
-                            i = 5
-                            with open(file, 'w') as f:
-                                df2.to_csv(f, index=False)
-                                print("re-wrote file: "+filename)
-                else:
-                    print("headers are correct, not sure the issue")
+
                 #print (sys.exc_info()[0])
                 pass
         else: #file is a duplicate
