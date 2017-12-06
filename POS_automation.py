@@ -18,7 +18,7 @@
 #           python script that can call functions in POS_automation
 #
 #
-#   
+#   v1 Candidate.  SWSO only
 #
 
 ##########################################################################################################
